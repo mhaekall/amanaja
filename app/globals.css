@@ -1,0 +1,154 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #3b9eff;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f8fc;
+  --secondary-foreground: #0f172a;
+  --muted: #f7f8fc;
+  --muted-foreground: #94a3b8;
+  --accent: #f472b6;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #3b9eff;
+  --radius: 0.75rem;
+
+  /* Amanaja custom tokens */
+  --blue-light: #dbeeff;
+  --blue-mid: #93c5fd;
+  --blue-main: #3b9eff;
+  --blue-dark: #1a6fd4;
+  --pink-light: #fce7f3;
+  --pink-mid: #f9a8d4;
+  --pink-main: #f472b6;
+  --off-white: #f7f8fc;
+  --text-dark: #0f172a;
+  --text-mid: #475569;
+  --text-soft: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-dark: #cbd5e1;
+}
+
+@theme inline {
+  --font-sans: var(--font-dm-sans), 'DM Sans', system-ui, sans-serif;
+  --font-serif: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-blue-light: var(--blue-light);
+  --color-blue-mid: var(--blue-mid);
+  --color-blue-main: var(--blue-main);
+  --color-blue-dark: var(--blue-dark);
+  --color-pink-light: var(--pink-light);
+  --color-pink-mid: var(--pink-mid);
+  --color-pink-main: var(--pink-main);
+  --color-off-white: var(--off-white);
+  --color-text-dark: var(--text-dark);
+  --color-text-mid: var(--text-mid);
+  --color-text-soft: var(--text-soft);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Amanaja animations */
+@keyframes blob-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(20px, -30px) scale(1.05); }
+  66% { transform: translate(-15px, 15px) scale(0.97); }
+}
+
+@keyframes float-card {
+  0% { transform: translateY(0) rotate(var(--rot-from, -1deg)); }
+  100% { transform: translateY(-16px) rotate(var(--rot-to, 1deg)); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.6; }
+}
+
+@keyframes blink-dot {
+  50% { opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-blob-float {
+  animation: blob-float 8s ease-in-out infinite;
+}
+
+.animate-float-card {
+  animation: float-card var(--dur, 6s) var(--delay, 0s) ease-in-out infinite alternate;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.animate-blink-dot {
+  animation: blink-dot 1.2s step-end infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease both;
+}
+
+.animate-fade-up-1 {
+  animation: fade-up 0.6s 0.1s ease both;
+}
+
+.animate-fade-up-2 {
+  animation: fade-up 0.6s 0.2s ease both;
+}
+
+.animate-fade-up-3 {
+  animation: fade-up 0.6s 0.3s ease both;
+}
+
+.animate-fade-up-4 {
+  animation: fade-up 0.6s 0.4s ease both;
+}
