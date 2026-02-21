@@ -1,9 +1,15 @@
+"use client"
+
+import { useI18n } from "@/lib/i18n-context"
+
 export default function StatsStrip() {
+  const { t } = useI18n()
+
   const stats = [
-    { num: "10", accent: "+", label: "Konten tersedia" },
-    { num: "4", accent: " kategori", label: "Serba ada" },
-    { num: "100", accent: "%", label: "Gratis selamanya" },
-    { num: "ID", accent: " + EN", label: "Dua bahasa" },
+    { num: "10", accent: "+", label: String(t("stats_content")) },
+    { num: "3", accent: String(t("stats_cat_accent")), label: String(t("stats_categories")) },
+    { num: "100", accent: "%", label: String(t("stats_free")) },
+    { num: "ID", accent: " + EN", label: String(t("stats_lang")) },
   ]
 
   return (

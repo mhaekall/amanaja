@@ -1,3 +1,6 @@
+"use client"
+
+import { I18nProvider } from "@/lib/i18n-context"
 import Navbar from "@/components/navbar"
 import HeroSection from "@/components/hero-section"
 import StatsStrip from "@/components/stats-strip"
@@ -9,15 +12,17 @@ import Footer from "@/components/footer"
 
 export default function Home() {
   return (
-    <main>
-      <Navbar />
-      <HeroSection />
-      <StatsStrip />
-      <CategoriesSection />
-      <FeaturedGame />
-      <ShareSection />
-      <CtaSection />
-      <Footer />
-    </main>
+    <I18nProvider>
+      <main>
+        <Navbar />
+        <HeroSection />
+        <StatsStrip />
+        <CategoriesSection />
+        <FeaturedGame />
+        <ShareSection />
+        <CtaSection />
+        <Footer />
+      </main>
+    </I18nProvider>
   )
 }

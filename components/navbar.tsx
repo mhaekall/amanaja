@@ -2,23 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
-
-const TEXTS = {
-  id: { cat: "Kategori", games: "Games", share: "Share" },
-  en: { cat: "Categories", games: "Games", share: "Share" },
-}
+import { useI18n } from "@/lib/i18n-context"
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
-  const [lang, setLang] = useState<"id" | "en">("id")
+  const { lang, setLang, t } = useI18n()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10)
     window.addEventListener("scroll", onScroll)
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
-
-  const t = TEXTS[lang]
 
   return (
     <nav
@@ -27,16 +21,16 @@ export default function Navbar() {
         scrolled && "shadow-sm"
       )}
     >
-      <a href="#" className="font-serif font-extrabold text-[22px] text-foreground tracking-tight flex items-center gap-2">
+      <a href="/" className="font-serif font-extrabold text-[22px] text-foreground tracking-tight flex items-center gap-2">
         Amanaja
         <span className="inline-block w-2 h-2 rounded-full bg-primary animate-pulse-dot" />
       </a>
 
       <ul className="hidden md:flex items-center gap-8">
         {[
-          { href: "#kategori", label: t.cat },
-          { href: "#games", label: t.games },
-          { href: "#share", label: t.share },
+          { href: "#kategori", label: String(t("nav_categories")) },
+          { href: "#games", label: String(t("nav_games")) },
+          { href: "#share", label: String(t("nav_share")) },
         ].map((link) => (
           <li key={link.href}>
             <a

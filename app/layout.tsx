@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, DM_Sans } from 'next/font/google'
+import { Bricolage_Grotesque, DM_Sans, Press_Start_2P } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
@@ -12,6 +12,13 @@ const bricolage = Bricolage_Grotesque({
 const dmSans = DM_Sans({
   subsets: ['latin'],
   variable: '--font-dm-sans',
+  display: 'swap',
+})
+
+const pressStart2P = Press_Start_2P({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-press-start',
   display: 'swap',
 })
 
@@ -44,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id" className={`${bricolage.variable} ${dmSans.variable}`}>
+    <html lang="id" className={`${bricolage.variable} ${dmSans.variable} ${pressStart2P.variable}`}>
       <body className="font-sans antialiased">
         {children}
         <Analytics />

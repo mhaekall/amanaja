@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useI18n } from "@/lib/i18n-context"
 
 export default function FeaturedGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const scoreRef = useRef<HTMLSpanElement>(null)
   const lengthRef = useRef<HTMLSpanElement>(null)
+  const { t } = useI18n()
 
   useEffect(() => {
     const c = canvasRef.current
@@ -108,24 +110,24 @@ export default function FeaturedGame() {
 
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 bg-primary/15 text-blue-mid text-[11px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full border border-primary/20 mb-5">
-            <span aria-hidden="true">&#x2B50;</span> Game Unggulan
+            {String(t("fg_badge"))}
           </div>
 
           <h2 className="font-serif text-[clamp(28px,3.5vw,48px)] font-extrabold text-primary-foreground tracking-tight leading-[1.1] mb-4 text-balance">
-            Ular Neo<br />
-            <span className="text-blue-mid">8-Bit.</span>
+            {String(t("fg_heading_1"))}<br />
+            <span className="text-blue-mid">{String(t("fg_heading_2"))}</span>
           </h2>
 
           <p className="text-[15px] text-primary-foreground/55 leading-relaxed font-light mb-7">
-            Game Snake klasik yang diremix habis-habisan — CRT visual, dash mechanic, efek partikel, dan sistem level. Main sekarang, share skormu.
+            {String(t("fg_desc"))}
           </p>
 
           <ul className="flex flex-col gap-2 mb-8">
             {[
-              "Efek visual retro CRT & pixel art",
-              "Dash mechanic dengan energy bar",
-              "Sistem level & special food",
-              "Mobile-friendly dengan D-pad",
+              String(t("fg_feat_1")),
+              String(t("fg_feat_2")),
+              String(t("fg_feat_3")),
+              String(t("fg_feat_4")),
             ].map((feat) => (
               <li key={feat} className="flex items-center gap-2.5 text-[13px] text-primary-foreground/70">
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-mid shrink-0" />
@@ -135,10 +137,10 @@ export default function FeaturedGame() {
           </ul>
 
           <a
-            href="#"
+            href="/games/ular-neo"
             className="relative z-10 inline-flex items-center gap-2.5 bg-primary text-primary-foreground font-semibold text-[15px] px-7 py-3.5 rounded-xl shadow-[0_4px_20px_rgba(59,158,255,0.35)] hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(59,158,255,0.5)] transition-all"
           >
-            &#x25B6; Main Sekarang
+            &#x25B6; {String(t("fg_cta"))}
           </a>
         </div>
 
@@ -152,7 +154,7 @@ export default function FeaturedGame() {
                 0
               </span>
               <span className="text-[10px] text-primary-foreground/40 uppercase tracking-widest">
-                Skor
+                {String(t("fg_score"))}
               </span>
             </div>
             <div className="text-center">
@@ -160,7 +162,7 @@ export default function FeaturedGame() {
                 3
               </span>
               <span className="text-[10px] text-primary-foreground/40 uppercase tracking-widest">
-                Panjang
+                {String(t("fg_length"))}
               </span>
             </div>
           </div>
