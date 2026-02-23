@@ -1,4 +1,4 @@
-import { VW, VH, MAX_HYPER_STACKS, NEON_GREEN, NEON_PINK } from "./constants"
+import { VW, VH, MAX_HYPER_STACKS, SKINS } from "./constants"
 
 export interface Particle {
   x: number; y: number; size: number; dx: number; dy: number; life: number; decay: number; color: string
@@ -9,6 +9,9 @@ export interface Trail {
 export interface Shockwave {
   x: number; y: number; radius: number; life: number; color: string
 }
+export interface OverlayParticle {
+  x: number; y: number; size: number; vx: number; vy: number; life: number; decay: number; color: string
+}
 
 export class Paddle {
   x: number
@@ -18,6 +21,7 @@ export class Paddle {
   baseH: number
   isAI: boolean
   score = 0
+  skin: string
   color: string
   prevY: number
   vy = 0
@@ -30,7 +34,7 @@ export class Paddle {
   reactionDelay = 0
   wasBallComing = false
 
-  constructor(x: number, isAI = false, stage = 1, mode = "ARCADE") {
+  constructor(x: number, isAI = false, stage = 1, mode = "ARCADE", equippedSkin = "BAJA") {
     this.x = x
     this.isAI = isAI
     this.baseH = 95
@@ -44,7 +48,9 @@ export class Paddle {
     this.prevY = this.y
     this.dragTargetY = this.y
     this.dpadTargetY = this.y
-    this.color = isAI ? (this.isBoss ? "#ff4400" : NEON_PINK) : NEON_GREEN
+    this.skin = isAI ? (this.isBoss ? "KIAMAT" : "BAJA") : equippedSkin
+    if (!SKINS[this.skin]) this.skin = "BAJA"
+    this.color = isAI ? (this.isBoss ? "#ff4400" : "#ff0066") : (SKINS[this.skin]?.clr ?? "#00e5ff")
     this.hyperStacks = isAI ? (this.isBoss ? 3 : 0) : MAX_HYPER_STACKS
   }
 
@@ -90,18 +96,17 @@ export class Paddle {
 
   draw(ctx: CanvasRenderingContext2D, timeTick: number) {
     const isHy = (!this.isAI && this.hyperPressed && this.hyperStacks > 0) || (this.isAI && this.hyperPressed)
+    const sk = SKINS[this.skin]
     ctx.save()
-    if (isHy) { ctx.shadowBlur = 14; ctx.shadowColor = "#ff7700" }
-    else { ctx.shadowBlur = 8; ctx.shadowColor = this.color }
-    ctx.fillStyle = isHy ? "#ff7700" : this.color
-    ctx.fillRect(this.x, this.y, this.w, this.h)
-    // Highlight edge
-    ctx.fillStyle = "rgba(255,255,255,0.35)"
-    ctx.fillRect(this.x + this.w - 2, this.y, 2, this.h)
-    // Animated pulse line
-    const pulseY = (timeTick * 2) % this.h
-    ctx.fillStyle = `rgba(255,255,255,${0.15 + Math.sin(timeTick * 0.08) * 0.1})`
-    ctx.fillRect(this.x, this.y + pulseY, this.w, 2)
+    if (isHy) { ctx.shadowBlur = 14; ctx.shadowColor = sk ? sk.glow : "#ff7700" }
+    try {
+      if (sk && sk.draw) {
+        sk.draw(ctx, this.x, this.y, this.w, this.h, timeTick, isHy)
+      } else {
+        ctx.fillStyle = isHy ? "#ff7700" : (sk ? sk.clr : this.color)
+        ctx.fillRect(this.x, this.y, this.w, this.h)
+      }
+    } catch { /* silence */ }
     ctx.restore()
   }
 }
@@ -148,22 +153,42 @@ export class Ball {
   }
 }
 
-export function spawnFx(particles: Particle[], x: number, y: number, color: string, n: number) {
+export function spawnFx(
+  particles: Particle[], x: number, y: number, color: string, n: number,
+  type: "normal" | "fast" | "fire" | "float" | "glitch" = "normal",
+) {
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2
-    const s = Math.random() * 6 + 2
-    particles.push({
-      x, y,
-      size: Math.random() * 3 + 2,
-      dx: Math.cos(a) * s,
-      dy: Math.sin(a) * s,
-      life: 1,
-      decay: Math.random() * 0.05 + 0.02,
-      color,
-    })
+    let s = Math.random() * 6 + 2
+    let pdx = Math.cos(a) * s, pdy = Math.sin(a) * s, life = 1, decay = Math.random() * 0.05 + 0.02, sz = Math.random() * 3 + 2
+    let c = color
+    if (type === "fast") { s *= 2; pdx = Math.cos(a) * s; pdy = Math.sin(a) * s }
+    if (type === "fire") { pdy = -Math.abs(pdy) - 2; pdx *= 0.5; life = 1.5; decay *= 0.8; sz *= 1.5 }
+    if (type === "float") { pdy *= 0.3; pdx *= 0.3; life = 2; decay *= 0.5 }
+    if (type === "glitch") { sz = Math.random() * 8 + 2; c = Math.random() > 0.5 ? color : "#fff" }
+    particles.push({ x, y, size: sz, dx: pdx, dy: pdy, life, decay, color: c })
   }
 }
 
 export function spawnShockwave(shockwaves: Shockwave[], x: number, y: number, color: string) {
   shockwaves.push({ x, y, radius: 5, life: 1, color })
+}
+
+export function spawnCanvasPixels(overlayParticles: OverlayParticle[], color: string, pixels: number, explosion = false) {
+  const n = explosion ? pixels * 2 : pixels * 3
+  const colors = [color, "#fff", "#ffee00", "#ff7700", "#ff0066", "#00e5ff"]
+  for (let i = 0; i < n; i++) {
+    overlayParticles.push({
+      x: explosion ? VW / 2 : VW * (0.2 + Math.random() * 0.6),
+      y: explosion ? VH / 2 : VH * (0.2 + Math.random() * 0.6),
+      size: Math.random() * 9 + 3,
+      vx: explosion ? (Math.random() - 0.5) * 14 : (Math.random() - 0.5) * 7,
+      vy: explosion ? (Math.random() - 0.5) * 14 : (Math.random() - 0.5) * 9 - 2,
+      life: 1,
+      decay: explosion ? 0.016 + Math.random() * 0.025 : 0.013 + Math.random() * 0.02,
+      color: explosion
+        ? [color, "#fff", "#ffee00"][Math.floor(Math.random() * 3)]
+        : colors[Math.floor(Math.random() * colors.length)],
+    })
+  }
 }
