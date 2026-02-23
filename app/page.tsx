@@ -6,6 +6,7 @@ import HeroSection from "@/components/hero-section"
 import StatsStrip from "@/components/stats-strip"
 import CategoriesSection from "@/components/categories-section"
 import FeaturedGame from "@/components/featured-game"
+import FeaturedNeonPong from "@/components/featured-neon-pong"
 import ShareSection from "@/components/share-section"
 import CtaSection from "@/components/cta-section"
 import Footer from "@/components/footer"
@@ -19,6 +20,7 @@ export default function Home() {
         <StatsStrip />
         <CategoriesSection />
         <FeaturedGame />
+        <FeaturedNeonPong />
         <ShareSection />
         <CtaSection />
         <Footer />
