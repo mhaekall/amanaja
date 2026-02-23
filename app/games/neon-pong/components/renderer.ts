@@ -1,5 +1,125 @@
-import { VW, VH, BG_DARK } from "./constants"
+import { VW, VH, BG_DARK, ANIM_DEFS } from "./constants"
+import type { AnimDef } from "./constants"
 import type { Paddle, Ball, Particle, Trail, Shockwave, OverlayParticle } from "./entities"
+
+// ===== GOAL ANIMATION STATE =====
+export interface GoalAnim {
+  active: boolean
+  key: string
+  startTime: number
+  dur: number
+  cfg: AnimDef | null
+}
+
+export function createGoalAnim(): GoalAnim {
+  return { active: false, key: "", startTime: 0, dur: 0, cfg: null }
+}
+
+export function triggerGoalAnim(anim: GoalAnim, key: string) {
+  const cfg = ANIM_DEFS[key]
+  if (!cfg) return
+  anim.active = true
+  anim.key = key
+  anim.startTime = performance.now()
+  anim.dur = cfg.dur
+  anim.cfg = cfg
+}
+
+function drawGoalAnimation(ctx: CanvasRenderingContext2D, anim: GoalAnim, timeTick: number) {
+  if (!anim.active || !anim.cfg) return
+  const elapsed = performance.now() - anim.startTime
+  const progress = Math.min(1, elapsed / anim.dur)
+  const cfg = anim.cfg
+
+  // Fade phases
+  const enterPhase = Math.min(1, elapsed / 300) // 0-300ms enter
+  const exitStart = anim.dur - 380
+  const exitPhase = elapsed > exitStart ? Math.min(1, (elapsed - exitStart) / 380) : 0
+
+  if (progress >= 1) {
+    anim.active = false
+    return
+  }
+
+  const alpha = enterPhase * (1 - exitPhase)
+
+  ctx.save()
+
+  // Background overlay
+  ctx.globalAlpha = alpha * 0.6
+  ctx.fillStyle = cfg.bgColor.split(",").slice(0, 3).join(",") + ",0.6)"
+  ctx.fillRect(0, 0, VW, VH)
+
+  // Glitch effect
+  const effect = cfg.effect
+  if ((effect === "glitch" || effect === "explodeGlitch" || effect === "fullChaos") && alpha > 0.3) {
+    ctx.globalCompositeOperation = "screen"
+    const glitchIntensity = effect === "fullChaos" ? 8 : 4
+    for (let i = 0; i < Math.floor(Math.random() * glitchIntensity + 2); i++) {
+      const gy = Math.random() * VH
+      const gh = Math.random() * 30 + 5
+      const shift = (Math.random() - 0.5) * 50
+      ctx.fillStyle = cfg.color
+      ctx.globalAlpha = (Math.random() * 0.15 + 0.03) * alpha
+      ctx.fillRect(shift, gy, VW, gh)
+    }
+    ctx.globalCompositeOperation = "source-over"
+  }
+
+  // Main text
+  const scale = effect === "shake"
+    ? 1 + Math.sin(elapsed * 0.02) * 0.05 * (1 - exitPhase)
+    : enterPhase < 1
+      ? 0.3 + enterPhase * 0.7 + (enterPhase < 0.5 ? 0 : Math.sin((enterPhase - 0.5) * Math.PI) * 0.3)
+      : 1 + exitPhase * 0.4
+
+  ctx.globalAlpha = alpha
+  ctx.save()
+  ctx.translate(VW / 2, VH / 2 - 10)
+  ctx.scale(scale, scale)
+
+  // Text shadow (pixel art style)
+  const fontSize = Math.min(VW * 0.12, 80)
+  ctx.font = `900 ${fontSize}px Orbitron, monospace`
+  ctx.textAlign = "center"
+  ctx.textBaseline = "middle"
+
+  // Drop shadow
+  ctx.fillStyle = "#000"
+  ctx.fillText(cfg.text, 3, 3)
+  ctx.fillText(cfg.text, -2, -2)
+
+  // Glow
+  ctx.shadowColor = cfg.glow
+  ctx.shadowBlur = 20 + Math.sin(timeTick * 0.1) * 10
+  ctx.fillStyle = cfg.color
+  ctx.fillText(cfg.text, 0, 0)
+  ctx.shadowBlur = 0
+
+  ctx.restore()
+
+  // Sub text
+  if (cfg.sub) {
+    const subAlpha = elapsed > 200 ? Math.min(1, (elapsed - 200) / 300) * (1 - exitPhase) : 0
+    ctx.globalAlpha = subAlpha
+    ctx.font = `700 ${Math.min(VW * 0.025, 18)}px 'Share Tech Mono', monospace`
+    ctx.textAlign = "center"
+    ctx.fillStyle = "#fff"
+    ctx.shadowColor = "#000"
+    ctx.shadowBlur = 4
+    ctx.fillText(cfg.sub, VW / 2, VH / 2 + 35)
+    ctx.shadowBlur = 0
+  }
+
+  // Flash effect on enter
+  if (effect === "flash" && elapsed < 200) {
+    ctx.globalAlpha = (1 - elapsed / 200) * 0.4
+    ctx.fillStyle = cfg.color
+    ctx.fillRect(0, 0, VW, VH)
+  }
+
+  ctx.restore()
+}
 
 export function drawGame(
   ctx: CanvasRenderingContext2D,
@@ -15,6 +135,7 @@ export function drawGame(
   screenFlash: number, screenFlashColor: string,
   rallyCount: number, rallyBannerTimer: number,
   animGlitchActive: boolean, glitchColor: string,
+  goalAnim?: GoalAnim,
 ) {
   ctx.fillStyle = BG_DARK
   ctx.fillRect(0, 0, VW, VH)
@@ -93,6 +214,11 @@ export function drawGame(
     }
     ctx.globalCompositeOperation = "source-over"
     ctx.globalAlpha = 1
+  }
+
+  // Goal / streak animation overlay
+  if (goalAnim && goalAnim.active) {
+    drawGoalAnimation(ctx, goalAnim, timeTick)
   }
 
   ctx.restore()

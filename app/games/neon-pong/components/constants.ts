@@ -121,7 +121,7 @@ export const SKINS: Record<string, SkinDef> = {
     },
   },
   BAYANG: {
-    name: "BAYANG", tier: "ANDAL", price: 150, unlockStage: 3, shape: "pill",
+    name: "BAYANG", tier: "ANDAL", price: 150, unlockStage: 0, shape: "pill",
     clr: "#8855ff", glow: "#aa77ff", desc: "Bayangan hidup. Melayang di antara dua dunia.",
     draw(c, x, y, w, h, t, hy) {
       const a = hy ? 0.92 : 0.45 + Math.sin(t * 0.09) * 0.28
@@ -134,7 +134,7 @@ export const SKINS: Record<string, SkinDef> = {
     },
   },
   PETIR: {
-    name: "PETIR", tier: "ANDAL", price: 200, unlockStage: 4, shape: "arrow",
+    name: "PETIR", tier: "ANDAL", price: 200, unlockStage: 0, shape: "arrow",
     clr: "#ffee00", glow: "#ffee00", desc: "Kilat statis dari badai sistem.",
     draw(c, x, y, w, h, t, hy) {
       drawShape(c, this.shape, x, y, w, h, () => {
@@ -146,7 +146,7 @@ export const SKINS: Record<string, SkinDef> = {
     },
   },
   LAUTAN: {
-    name: "LAUTAN", tier: "ANDAL", price: 220, unlockStage: 5, shape: "rounded",
+    name: "LAUTAN", tier: "ANDAL", price: 220, unlockStage: 0, shape: "rounded",
     clr: "#0099ff", glow: "#00ccff", desc: "Tenang di permukaan. Mematikan di kedalaman.",
     draw(c, x, y, w, h, t, hy) {
       drawShape(c, this.shape, x, y, w, h, () => {
@@ -161,7 +161,7 @@ export const SKINS: Record<string, SkinDef> = {
     },
   },
   NAGA: {
-    name: "NAGA", tier: "LANGKA", price: 400, unlockStage: 8, shape: "shield",
+    name: "NAGA", tier: "LANGKA", price: 400, unlockStage: 0, shape: "shield",
     clr: "#ff4400", glow: "#ff6600", desc: "Api naga purba menyala dalam jalur data.",
     draw(c, x, y, w, h, t, hy) {
       drawShape(c, this.shape, x, y, w, h, () => {
@@ -176,7 +176,7 @@ export const SKINS: Record<string, SkinDef> = {
     },
   },
   RACUN: {
-    name: "RACUN", tier: "LANGKA", price: 450, unlockStage: 9, shape: "hexagon",
+    name: "RACUN", tier: "LANGKA", price: 450, unlockStage: 0, shape: "hexagon",
     clr: "#44ff44", glow: "#88ff00", desc: "Zat toksik dari server yang terinfeksi.",
     draw(c, x, y, w, h, t, hy) {
       drawShape(c, this.shape, x, y, w, h, () => {
@@ -481,6 +481,10 @@ export const SKINS: Record<string, SkinDef> = {
 
 // Tier sort order
 export const TIER_ORDER = ["BIASA", "ANDAL", "LANGKA", "SAKTI", "MAHAKUASA", "DEWA", "RAMADAN"]
+
+// Boss AI nerf tracking — reduces boss difficulty by 20% per player loss (max 50% after 2 losses)
+export const BOSS_NERF_PER_LOSS = 0.20
+export const BOSS_NERF_MAX = 0.50
 
 // Animation definitions
 export interface AnimDef {

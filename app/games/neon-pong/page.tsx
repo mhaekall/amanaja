@@ -8,7 +8,8 @@ import { Paddle, Ball, spawnFx, spawnShockwave, spawnCanvasPixels } from "./comp
 import type { Particle, Trail, Shockwave, OverlayParticle } from "./components/entities"
 import { collideBall } from "./components/collision"
 import type { GameRefs } from "./components/collision"
-import { drawGame, drawGaragePreview } from "./components/renderer"
+import { drawGame, drawGaragePreview, createGoalAnim, triggerGoalAnim } from "./components/renderer"
+import type { GoalAnim } from "./components/renderer"
 import { PongAudioEngine, BGM_DEFS } from "./components/audio-engine"
 
 // Save/Load
@@ -40,12 +41,12 @@ export default function NeonPongPage() {
   const [playerScore, setPlayerScore] = useState(0)
   const [aiScore, setAiScore] = useState(0)
   const [winner, setWinner] = useState<"PLAYER" | "CPU" | null>(null)
-  const [ctrlMode, setCtrlMode] = useState<"drag" | "dpad">("drag")
+  const [ctrlMode, setCtrlMode] = useState<"drag" | "dpad">("dpad")
   const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">("normal")
   const [bgmIdx, setBgmIdx] = useState(0)
 
   // Persistent state
-  const [coins, setCoins] = useState(999999)
+  const [coins, setCoins] = useState(0)
   const [stage, setStage] = useState(1)
   const [unlockedSkins, setUnlockedSkins] = useState<string[]>(["BAJA"])
   const [equippedSkin, setEquippedSkin] = useState("BAJA")
@@ -53,7 +54,8 @@ export default function NeonPongPage() {
   const [showGameoverBtns, setShowGameoverBtns] = useState(false)
   const [coinReward, setCoinReward] = useState(0)
   const [newUnlocks, setNewUnlocks] = useState<string[]>([])
-
+  const [bossLossCount, setBossLossCount] = useState(0)
+  const goalAnimRef = useRef<GoalAnim>(createGoalAnim())
   // Load saved data
   useEffect(() => {
     const gd = loadGameData()
@@ -77,7 +79,7 @@ export default function NeonPongPage() {
     mode: "ARCADE" as "ARCADE" | "QUICK",
     stage: 1,
     difficulty: "normal" as string,
-    ctrlMode: "drag" as string,
+    ctrlMode: "dpad" as string,
     equippedSkin: "BAJA",
     timeTick: 0,
     shakeX: 0, shakeY: 0, shakeDec: 0,
@@ -95,7 +97,8 @@ export default function NeonPongPage() {
     keys: {} as Record<string, boolean>,
     dragTouchId: null as number | null,
     animGlitchActive: false, glitchColor: "#fff",
-    coins: 999999, unlockedSkins: ["BAJA"],
+    coins: 0, unlockedSkins: ["BAJA"],
+    bossLossCount: 0,
   })
 
   // Sync refs
@@ -104,6 +107,7 @@ export default function NeonPongPage() {
   useEffect(() => { gameRef.current.stage = stage }, [stage])
   useEffect(() => { gameRef.current.equippedSkin = equippedSkin }, [equippedSkin])
   useEffect(() => { gameRef.current.coins = coins; gameRef.current.unlockedSkins = unlockedSkins }, [coins, unlockedSkins])
+  useEffect(() => { gameRef.current.bossLossCount = bossLossCount }, [bossLossCount])
 
   // Init audio
   useEffect(() => {
@@ -160,6 +164,8 @@ export default function NeonPongPage() {
     if (effect === "explode" || effect === "explodeGlitch" || effect === "fullChaos") {
       setTimeout(() => spawnCanvasPixels(g.overlayParticles, cfg.color, cfg.pixels, true), 200)
     }
+    // Trigger canvas-based text animation
+    triggerGoalAnim(goalAnimRef.current, defKey)
     setTimeout(() => {
       g.animGlitchActive = false
       callback()
@@ -209,7 +215,7 @@ export default function NeonPongPage() {
     if (who === "PLAYER") {
       if (g.mode === "ARCADE") {
         reward = 20 + g.stage * 5
-        if (g.ai?.isBoss) reward += 50
+        if (g.ai?.isBoss) { reward += 50; setBossLossCount(0); g.bossLossCount = 0 } // Reset on boss win
         const newStage = g.stage + 1
         g.stage = newStage; setStage(newStage)
         unlocks = checkUnlocks(g.coins + reward, newStage, g.unlockedSkins)
@@ -218,6 +224,17 @@ export default function NeonPongPage() {
       saveGameData(g.coins, g.stage, g.unlockedSkins, g.equippedSkin)
       audioRef.current?.win()
     } else {
+      // Track boss losses for difficulty reduction
+      if (g.mode === "ARCADE" && g.ai?.isBoss) {
+        const newCount = Math.min(g.bossLossCount + 1, 3)
+        setBossLossCount(newCount); g.bossLossCount = newCount
+      }
+      // Small consolation coins for losing
+      if (g.mode === "ARCADE") {
+        reward = Math.max(5, Math.floor(g.stage * 2))
+        g.coins += reward; setCoins(g.coins)
+        saveGameData(g.coins, g.stage, g.unlockedSkins, g.equippedSkin)
+      }
       audioRef.current?.lose()
     }
     setCoinReward(reward); setNewUnlocks(unlocks)
@@ -258,7 +275,7 @@ export default function NeonPongPage() {
 
     g.mode = mode
     g.player = new Paddle(28, false, g.stage, mode, g.equippedSkin)
-    g.ai = new Paddle(VW - 28 - 14, true, g.stage, mode)
+    g.ai = new Paddle(VW - 28 - 14, true, g.stage, mode, "BAJA", g.bossLossCount)
     g.balls = []; g.particles = []; g.trails = []; g.shockwaves = []; g.overlayParticles = []
     g.spawningBall = false; g.goalAnimating = false; g.hitStop = 0
     g.rallyCount = 0; g.rallyBannerTimer = 0; g.timeTick = 0
@@ -266,6 +283,7 @@ export default function NeonPongPage() {
     g.playerStreak = 0; g.aiStreak = 0; g.prevPlayerScore = 0; g.prevAiScore = 0
     g.dpadUp = false; g.dpadDown = false
     g.animGlitchActive = false
+    goalAnimRef.current = createGoalAnim()
 
     setPlayerScore(0); setAiScore(0)
     g.phase = "PLAYING"; setPhase("PLAYING"); setWinner(null)
@@ -320,7 +338,14 @@ export default function NeonPongPage() {
       if (mode === "ARCADE") {
         predChance = Math.min(0.9, g.stage * 0.1)
         errMargin = Math.max(5, 40 - g.stage * 3)
-        if (g.ai.isBoss) errMargin += 15
+        if (g.ai.isBoss) {
+          errMargin += 15
+          // Apply boss nerf to prediction accuracy
+          if (g.ai.bossNerf > 0) {
+            predChance *= (1 - g.ai.bossNerf)
+            errMargin += Math.round(errMargin * g.ai.bossNerf)
+          }
+        }
       } else {
         switch (g.difficulty) {
           case "easy": predChance = 0; errMargin = 40; break
@@ -414,7 +439,8 @@ export default function NeonPongPage() {
       g.timeTick++
       drawGame(ctx, g.player, g.ai, g.balls, g.particles, g.trails, g.shockwaves, g.overlayParticles,
         g.timeTick, g.shakeX, g.shakeY, g.screenFlash, g.screenFlashColor,
-        g.rallyCount, g.rallyBannerTimer, g.animGlitchActive, g.glitchColor)
+        g.rallyCount, g.rallyBannerTimer, g.animGlitchActive, g.glitchColor,
+        goalAnimRef.current)
     }
 
     function loop() { update(); render(); g.animId = requestAnimationFrame(loop) }
@@ -732,8 +758,13 @@ export default function NeonPongPage() {
                 {winner === "PLAYER" ? "VICTORY" : "DEFEAT"}
               </div>
               <div className="mb-1.5" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.42rem, 1.4vw, .62rem)", letterSpacing: ".18em", color: winner === "PLAYER" ? "#ffee00" : "rgba(255,255,255,.55)" }}>
-                {winner === "PLAYER" ? `+${coinReward} COINS ACQUIRED` : "SYSTEM BLOCKED"}
+                {winner === "PLAYER" ? `+${coinReward} COINS ACQUIRED` : coinReward > 0 ? `+${coinReward} COINS (CONSOLATION)` : "SYSTEM BLOCKED"}
               </div>
+              {winner !== "PLAYER" && gameRef.current.mode === "ARCADE" && gameRef.current.ai?.isBoss && bossLossCount > 0 && (
+                <div className="mb-2" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.38rem, 1.2vw, .55rem)", color: "#00e5ff" }}>
+                  BOSS WEAKENED: -{Math.min(50, bossLossCount * 20)}% DIFFICULTY
+                </div>
+              )}
               {newUnlocks.length > 0 && (
                 <div className="mb-2" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.38rem, 1.2vw, .57rem)", color: "#ffee00" }}>
                   UNLOCKED: {newUnlocks.join(" | ")}

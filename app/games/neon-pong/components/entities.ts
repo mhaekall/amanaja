@@ -1,4 +1,4 @@
-import { VW, VH, MAX_HYPER_STACKS, SKINS } from "./constants"
+import { VW, VH, MAX_HYPER_STACKS, SKINS, BOSS_NERF_PER_LOSS, BOSS_NERF_MAX } from "./constants"
 
 export interface Particle {
   x: number; y: number; size: number; dx: number; dy: number; life: number; decay: number; color: string
@@ -33,8 +33,9 @@ export class Paddle {
   isBoss: boolean
   reactionDelay = 0
   wasBallComing = false
+  bossNerf = 0 // 0..0.5, reduces boss AI difficulty
 
-  constructor(x: number, isAI = false, stage = 1, mode = "ARCADE", equippedSkin = "BAJA") {
+  constructor(x: number, isAI = false, stage = 1, mode = "ARCADE", equippedSkin = "BAJA", bossLossCount = 0) {
     this.x = x
     this.isAI = isAI
     this.baseH = 95
@@ -42,6 +43,8 @@ export class Paddle {
     if (isAI && mode === "ARCADE" && stage % 5 === 0) {
       this.baseH = 175
       this.isBoss = true
+      // Apply accumulated nerf: 20% per loss, max 50%
+      this.bossNerf = Math.min(BOSS_NERF_MAX, bossLossCount * BOSS_NERF_PER_LOSS)
     }
     this.h = this.baseH
     this.y = VH / 2 - this.baseH / 2
@@ -65,7 +68,14 @@ export class Paddle {
         if (mode === "ARCADE") {
           maxSpd = 3.0 + stage * 0.4
           smooth = 0.05 + stage * 0.01
-          if (this.isBoss) { maxSpd *= 0.7; smooth *= 0.8 }
+          if (this.isBoss) {
+            maxSpd *= 0.7; smooth *= 0.8
+            // Apply boss nerf: reduce speed/accuracy by nerf amount
+            if (this.bossNerf > 0) {
+              maxSpd *= (1 - this.bossNerf)
+              smooth *= (1 - this.bossNerf)
+            }
+          }
         } else {
           switch (difficulty) {
             case "easy": maxSpd = 2.5; smooth = 0.04; break
