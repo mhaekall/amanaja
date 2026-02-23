@@ -113,7 +113,7 @@ export function collideBall(
 
     if (refs.rallyCount === 10) {
       audio?.rallyAlert()
-      refs.screenFlash = 0.4; refs.screenFlashColor = "#ff7700"; refs.shakeDec = 30
+      refs.screenFlash = 0.15; refs.screenFlashColor = "#ff7700"; refs.shakeDec = 10
     }
     if (refs.rallyCount >= 10) {
       ball.mult += 0.15
@@ -135,8 +135,9 @@ export function collideBall(
       }
     } else {
       let aHC = 0
-      if (paddle.isBoss && paddle.hyperStacks > 0) aHC = 0.4
-      else if (gameMode === "ARCADE") aHC = currentStage * 0.05
+      if (paddle.isBoss && paddle.hyperStacks > 0) {
+        aHC = 0.4 * (1 - paddle.bossNerf)
+      } else if (gameMode === "ARCADE") aHC = currentStage * 0.05
       else { switch (aiDifficulty) { case "normal": aHC = 0.2; break; case "hard": aHC = 0.5; break } }
 
       if (ball.mult > 1.8 && Math.random() < aHC && paddle.hyperStacks > 0) {

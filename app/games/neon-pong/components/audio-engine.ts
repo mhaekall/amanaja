@@ -26,7 +26,7 @@ export class PongAudioEngine {
   bgmPlaying = false
   bgmTimer: ReturnType<typeof setTimeout> | null = null
   bgmNoteI = 0
-  bgmIdx = 0
+  bgmIdx = 4
 
   init() {
     if (!this.ctx) {
