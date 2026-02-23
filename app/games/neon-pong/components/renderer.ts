@@ -183,12 +183,12 @@ export function drawGame(
   if (ai) ai.draw(ctx, timeTick)
   for (const b of balls) b.draw(ctx)
 
-  // Rally banner
+  // Rally banner (subtle)
   if (rallyBannerTimer > 0) {
-    ctx.fillStyle = `rgba(255,119,0,${rallyBannerTimer / 60})`
-    ctx.font = "900 55px Orbitron, monospace"
+    ctx.fillStyle = `rgba(255,119,0,${Math.min(0.5, rallyBannerTimer / 30)})`
+    ctx.font = "700 28px Orbitron, monospace"
     ctx.textAlign = "center"
-    ctx.fillText("RALLY FRENZY!", VW / 2, VH / 2 - 45)
+    ctx.fillText("RALLY!", VW / 2, 30)
   }
 
   // Overlay particles (animation effects)

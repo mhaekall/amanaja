@@ -43,7 +43,7 @@ export default function NeonPongPage() {
   const [winner, setWinner] = useState<"PLAYER" | "CPU" | null>(null)
   const [ctrlMode, setCtrlMode] = useState<"drag" | "dpad">("dpad")
   const [difficulty, setDifficulty] = useState<"easy" | "normal" | "hard">("normal")
-  const [bgmIdx, setBgmIdx] = useState(0)
+  const [bgmIdx, setBgmIdx] = useState(4)
 
   // Persistent state
   const [coins, setCoins] = useState(0)
@@ -431,7 +431,7 @@ export default function NeonPongPage() {
       } else { g.shakeX = 0; g.shakeY = 0 }
       if (g.screenFlash > 0) g.screenFlash = Math.max(0, g.screenFlash - 0.05)
       if (g.rallyBannerTimer > 0) g.rallyBannerTimer--
-      if (g.rallyCount === 10) { g.rallyBannerTimer = 60; audioRef.current?.rallyAlert(); g.screenFlash = 0.4; g.screenFlashColor = "#ff7700"; g.shakeDec = 30 }
+      if (g.rallyCount === 10) { g.rallyBannerTimer = 30; audioRef.current?.rallyAlert(); g.screenFlash = 0.15; g.screenFlashColor = "#ff7700"; g.shakeDec = 10 }
     }
 
     function render() {
@@ -593,33 +593,43 @@ export default function NeonPongPage() {
 
         {/* ===== MENU ===== */}
         {phase === "MENU" && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-30 text-center p-4 rounded-lg overflow-y-auto" style={{ background: "rgba(9,5,20,0.97)" }}>
+          <div className="absolute inset-0 flex flex-col items-center z-30 text-center rounded-lg overflow-y-auto" style={{ background: "rgba(9,5,20,0.97)" }}>
             {/* Grid bg animation */}
             <div className="absolute inset-0 pointer-events-none" style={{
-              backgroundImage: "linear-gradient(rgba(0,229,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,.07) 1px, transparent 1px)",
+              backgroundImage: "linear-gradient(rgba(255,215,0,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,215,0,.04) 1px, transparent 1px)",
               backgroundSize: "44px 44px", animation: "gd 18s linear infinite",
             }} />
             <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.97) 100%)" }} />
-            <div className="relative z-10 flex flex-col items-center gap-3 w-full max-w-[400px]">
-              <h1 className="font-black" style={{ fontSize: "clamp(2.2rem, 9vw, 4rem)", letterSpacing: ".12em", color: "#00ff88", textShadow: "0 0 25px #00ff88", animation: "lp 2s ease-in-out infinite" }}>NEON PONG</h1>
-              <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.42rem, 1.6vw, .65rem)", letterSpacing: ".28em", color: "#00e5ff", textShadow: "0 0 8px #00e5ff" }}>8-BIT EPIC EDITION</p>
-              <div className="flex gap-2">
-                <span className="px-3.5 py-1 rounded-md text-[#ffee00] border border-[rgba(255,238,0,.3)]" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.58rem, 1.8vw, .75rem)", background: "rgba(255,238,0,.1)" }}>COINS: {coins}</span>
-                <span className="px-3.5 py-1 rounded-md text-[#ff7700] border border-[#ff7700]" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.58rem, 1.8vw, .75rem)", background: "rgba(255,119,0,.1)" }}>STAGE: {stage}</span>
+            <div className="relative z-10 flex flex-col items-center gap-2.5 w-full max-w-[400px] px-4 py-5">
+              {/* Ramadan event badge */}
+              <div className="px-4 py-1.5 rounded-full" style={{ border: "1px solid rgba(255,215,0,.35)", background: "rgba(255,215,0,.08)" }}>
+                <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.4rem, 1.3vw, .55rem)", letterSpacing: ".22em", color: "#ffd700" }}>RAMADAN EVENT</span>
               </div>
-              <button onClick={() => { audioRef.current?.init(); startGame("ARCADE") }} className="w-full py-3 rounded-lg font-black uppercase" style={{ fontSize: "clamp(.72rem, 2.8vw, 1rem)", letterSpacing: ".18em", background: "rgba(255,119,0,.05)", border: "2px solid #ff7700", color: "#ff7700", boxShadow: "0 0 12px rgba(255,119,0,.18)", cursor: "pointer" }}>
+              <h1 className="font-black" style={{ fontSize: "clamp(1.8rem, 8vw, 3.5rem)", letterSpacing: ".12em", color: "#00ff88", textShadow: "0 0 25px #00ff88", animation: "lp 2s ease-in-out infinite", lineHeight: 1.1 }}>NEON PONG</h1>
+              <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.38rem, 1.4vw, .58rem)", letterSpacing: ".28em", color: "#ffd700", textShadow: "0 0 8px rgba(255,215,0,.5)" }}>RAMADAN KAREEM EDITION</p>
+              <div className="flex gap-2">
+                <span className="px-3 py-1 rounded-md text-[#ffee00] border border-[rgba(255,238,0,.3)]" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.5rem, 1.6vw, .68rem)", background: "rgba(255,238,0,.1)" }}>COINS: {coins}</span>
+                <span className="px-3 py-1 rounded-md text-[#ff7700] border border-[#ff7700]" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.5rem, 1.6vw, .68rem)", background: "rgba(255,119,0,.1)" }}>STAGE: {stage}</span>
+              </div>
+              <button onClick={() => { audioRef.current?.init(); startGame("ARCADE") }} className="w-full py-2.5 rounded-lg font-black uppercase" style={{ fontSize: "clamp(.65rem, 2.5vw, .92rem)", letterSpacing: ".18em", background: "rgba(255,119,0,.05)", border: "2px solid #ff7700", color: "#ff7700", boxShadow: "0 0 12px rgba(255,119,0,.18)", cursor: "pointer" }}>
                 ARCADE (ST.{stage})
               </button>
-              <button onClick={() => { audioRef.current?.init(); startGame("QUICK") }} className="w-full py-3 rounded-lg font-black uppercase" style={{ fontSize: "clamp(.72rem, 2.8vw, 1rem)", letterSpacing: ".18em", background: "rgba(0,255,136,.05)", border: "2px solid #00ff88", color: "#00ff88", boxShadow: "0 0 12px rgba(0,255,136,.18)", cursor: "pointer" }}>
+              <button onClick={() => { audioRef.current?.init(); startGame("QUICK") }} className="w-full py-2.5 rounded-lg font-black uppercase" style={{ fontSize: "clamp(.65rem, 2.5vw, .92rem)", letterSpacing: ".18em", background: "rgba(0,255,136,.05)", border: "2px solid #00ff88", color: "#00ff88", boxShadow: "0 0 12px rgba(0,255,136,.18)", cursor: "pointer" }}>
                 QUICK PLAY
               </button>
               <div className="flex gap-2 w-full">
-                <button onClick={() => { setSelectedGarageSkin(equippedSkin); setPhase("GARAGE") }} className="flex-1 py-2.5 rounded-md font-bold uppercase" style={{ fontSize: "clamp(.5rem, 1.8vw, .66rem)", letterSpacing: ".12em", border: "2px solid #00e5ff", color: "#00e5ff", background: "transparent", boxShadow: "0 0 8px rgba(0,229,255,.18)", cursor: "pointer" }}>
+                <button onClick={() => { setSelectedGarageSkin(equippedSkin); setPhase("GARAGE") }} className="flex-1 py-2 rounded-md font-bold uppercase" style={{ fontSize: "clamp(.45rem, 1.6vw, .6rem)", letterSpacing: ".12em", border: "2px solid #00e5ff", color: "#00e5ff", background: "transparent", boxShadow: "0 0 8px rgba(0,229,255,.18)", cursor: "pointer" }}>
                   GARAGE
                 </button>
-                <button onClick={() => setPhase("SETTINGS")} className="flex-1 py-2.5 rounded-md font-bold uppercase" style={{ fontSize: "clamp(.5rem, 1.8vw, .66rem)", letterSpacing: ".12em", border: "1px solid rgba(255,255,255,.2)", color: "rgba(255,255,255,.7)", background: "transparent", cursor: "pointer" }}>
+                <button onClick={() => setPhase("SETTINGS")} className="flex-1 py-2 rounded-md font-bold uppercase" style={{ fontSize: "clamp(.45rem, 1.6vw, .6rem)", letterSpacing: ".12em", border: "1px solid rgba(255,255,255,.2)", color: "rgba(255,255,255,.7)", background: "transparent", cursor: "pointer" }}>
                   SETTING
                 </button>
+              </div>
+              {/* Ramadan tip */}
+              <div className="w-full mt-1 px-3 py-2 rounded-md" style={{ border: "1px solid rgba(255,215,0,.15)", background: "rgba(255,215,0,.04)" }}>
+                <p style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.35rem, 1.1vw, .48rem)", color: "rgba(255,215,0,.6)", lineHeight: 1.6 }}>
+                  Skin bonus Ramadan tersedia! Capai stage tertentu untuk unlock skin eksklusif.
+                </p>
               </div>
             </div>
           </div>
@@ -760,11 +770,7 @@ export default function NeonPongPage() {
               <div className="mb-1.5" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.42rem, 1.4vw, .62rem)", letterSpacing: ".18em", color: winner === "PLAYER" ? "#ffee00" : "rgba(255,255,255,.55)" }}>
                 {winner === "PLAYER" ? `+${coinReward} COINS ACQUIRED` : coinReward > 0 ? `+${coinReward} COINS (CONSOLATION)` : "SYSTEM BLOCKED"}
               </div>
-              {winner !== "PLAYER" && gameRef.current.mode === "ARCADE" && gameRef.current.ai?.isBoss && bossLossCount > 0 && (
-                <div className="mb-2" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.38rem, 1.2vw, .55rem)", color: "#00e5ff" }}>
-                  BOSS WEAKENED: -{Math.min(50, bossLossCount * 20)}% DIFFICULTY
-                </div>
-              )}
+
               {newUnlocks.length > 0 && (
                 <div className="mb-2" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: "clamp(.38rem, 1.2vw, .57rem)", color: "#ffee00" }}>
                   UNLOCKED: {newUnlocks.join(" | ")}
@@ -831,6 +837,7 @@ export default function NeonPongPage() {
       <style jsx global>{`
         @keyframes gd { to { background-position: 44px 44px } }
         @keyframes lp { 0%, 100% { text-shadow: 0 0 18px #00ff88 } 50% { text-shadow: 0 0 38px #00ff88 } }
+        @keyframes starTwinkle { 0%, 100% { opacity: .3 } 50% { opacity: 1 } }
       `}</style>
     </div>
   )

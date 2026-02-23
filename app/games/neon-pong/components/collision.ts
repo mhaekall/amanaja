@@ -113,7 +113,7 @@ export function collideBall(
 
     if (refs.rallyCount === 10) {
       audio?.rallyAlert()
-      refs.screenFlash = 0.4; refs.screenFlashColor = "#ff7700"; refs.shakeDec = 30
+      refs.screenFlash = 0.15; refs.screenFlashColor = "#ff7700"; refs.shakeDec = 10
     }
     if (refs.rallyCount >= 10) {
       ball.mult += 0.15
