@@ -33,7 +33,7 @@ const translations = {
     cat_desc: "Pilih sesukamu. Semuanya gratis, semuanya seru, dan hasilnya bisa langsung kamu share.",
     cat_games_title: "Games",
     cat_games_desc: "Game arcade seru yang bisa kamu main kapan saja dan bagikan skormu ke teman.",
-    cat_games_tags: ["Snake Neo", "Flappy Bird", "2048", "+ lainnya"],
+    cat_games_tags: ["Snake Neo", "Neon Pong", "2048", "+ lainnya"],
     cat_edu_title: "Edukasi",
     cat_edu_desc: "Quiz interaktif dan flashcard yang bikin belajar terasa menyenangkan dan tidak membosankan.",
     cat_edu_tags: ["Kuis Sejarah", "Sains", "Bahasa", "+ lainnya"],
@@ -53,6 +53,18 @@ const translations = {
     fg_cta: "Main Sekarang",
     fg_score: "Skor",
     fg_length: "Panjang",
+
+    // Featured Pong
+    fp_badge: "Game Baru",
+    fp_heading_1: "Neon Pong",
+    fp_heading_2: "Ultimate.",
+    fp_desc: "Game Pong klasik dengan sentuhan neon futuristik \u2014 hyper strike, arcade mode, efek partikel, dan visual retro CRT. Tantang CPU sekarang.",
+    fp_feat_1: "Visual neon retro dengan CRT scanline",
+    fp_feat_2: "Hyper Strike untuk smash super",
+    fp_feat_3: "Arcade Mode dengan stage progresif",
+    fp_feat_4: "Mobile-friendly dengan drag & D-pad",
+    fp_cta: "Main Sekarang",
+    fp_player: "KAMU",
 
     // Share
     share_badge: "Share System",
@@ -109,7 +121,7 @@ const translations = {
     cat_desc: "Pick what you like. Everything is free, fun, and instantly shareable.",
     cat_games_title: "Games",
     cat_games_desc: "Fun arcade games you can play anytime and share your scores with friends.",
-    cat_games_tags: ["Snake Neo", "Flappy Bird", "2048", "+ more"],
+    cat_games_tags: ["Snake Neo", "Neon Pong", "2048", "+ more"],
     cat_edu_title: "Education",
     cat_edu_desc: "Interactive quizzes and flashcards that make learning fun and engaging.",
     cat_edu_tags: ["History Quiz", "Science", "Language", "+ more"],
@@ -129,6 +141,18 @@ const translations = {
     fg_cta: "Play Now",
     fg_score: "Score",
     fg_length: "Length",
+
+    // Featured Pong
+    fp_badge: "New Game",
+    fp_heading_1: "Neon Pong",
+    fp_heading_2: "Ultimate.",
+    fp_desc: "The classic Pong game with a futuristic neon twist \u2014 hyper strike, arcade mode, particle effects, and retro CRT visuals. Challenge the CPU now.",
+    fp_feat_1: "Retro neon visuals with CRT scanlines",
+    fp_feat_2: "Hyper Strike for super smash",
+    fp_feat_3: "Arcade Mode with progressive stages",
+    fp_feat_4: "Mobile-friendly with drag & D-pad",
+    fp_cta: "Play Now",
+    fp_player: "YOU",
 
     // Share
     share_badge: "Share System",
